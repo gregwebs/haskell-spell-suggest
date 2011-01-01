@@ -1,0 +1,5 @@
+Running the program thimk-makedb with the necessary
+privileges will generate a file thimk.sq3 in this directory.
+This file is a database mapping each word in the dictionary
+to a phonetic code in each supported coding system.  This
+will accelerate thimk substantially.

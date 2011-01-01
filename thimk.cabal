@@ -1,0 +1,50 @@
+name: spell-suggest
+version: 0.4.0
+cabal-version: >= 1.2
+build-type: Simple
+license: BSD3
+license-file: COPYING
+copyright: Copyright © 2010 Bart Massey
+author: Bart Massey
+maintainer: bart@cs.pdx.edu, Greg Weber <greg@gregweber.info>
+stability: alpha
+homepage: http://wiki.cs.pdx.edu/bartforge/thimk
+category: Console, Text
+data-files: README, README.pcdb
+synopsis: spelling suggestion tool. Library and command-line interfaces.
+description: 
+
+    "thimk" (an old joke) is a command-line spelling word
+    suggestion tool. You give it a possibly-misspelled word,
+    and it spits out one or more properly-spelled words in order
+    of likelihood of similarity.
+    .
+    This package is also exported as a library: Text.Spell (suggest)
+    .
+    There is an optional precompiled SQlite database of phonetic
+    codes for the entire dictionary, created with
+    "thimk-makedb".  This greatly speeds lookup, permitting
+    reasonable performance on enormous dictionaries.
+
+flag debug
+
+library
+  build-depends: base >= 4.2 && < 5,
+                 edit-distance >= 0.1, phonetic-code >= 0.1,
+                 sqlite >= 0.5.1
+  exposed-modules: Text.Spell, Text.Spell.PCDB
+  ghc-options:     -Wall
+
+Executable thimk
+  main-is: thimk.hs
+  build-depends: base >= 4.2 && < 5, parseargs >= 0.1.1,
+                 edit-distance >= 0.1, phonetic-code >= 0.1,
+                 sqlite >= 0.5.1
+  ghc-options:     -Wall
+
+Executable thimk-makedb
+  main-is: thimk-makedb.hs
+  build-depends: parseargs >= 0.1.1, sqlite >= 0.4.1, phonetic-code >= 0.1
+  ghc-options:     -Wall
+  if flag(debug)
+    cpp-options: -DDEBUG

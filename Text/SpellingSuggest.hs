@@ -80,7 +80,8 @@ dictionaryIsDB (SpellingDatabase _) = True
 dictionaryIsDB _ = False
 
 -- | Make a connection to the given or default database. If this fails,
--- open the given or default dictionary and cache the words.
+-- open the given or default dictionary and cache the words. XXX Will
+-- leak a file handle if 'readDictionary' does.
 openDictionary :: Maybe String -> Maybe String -> IO SpellingDictionary
 openDictionary dbPath dictPath = do
   mdb <- openDB dbPath

@@ -14,11 +14,13 @@ import System.IO
 defaultDictionary :: String
 defaultDictionary = "/usr/share/dict/words"
 
--- | Read the words out of the dictionary at the given path.
+-- | Read the words out of the dictionary at the given
+-- path. XXX Will leak a file handle until/unless it is
+-- finalized, since there's no non-trivial way to arrange
+-- for the dictionary file to be closed explicitly.
 readDictionary :: Maybe String -> IO [String]
 readDictionary dictPath = do
   wf <- flip openFile ReadMode $ fromMaybe defaultDictionary dictPath
   hSetEncoding wf utf8
   wc <- hGetContents wf
-  hClose wf
   return $ lines wc

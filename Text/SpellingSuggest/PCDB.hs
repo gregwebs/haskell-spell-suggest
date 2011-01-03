@@ -6,10 +6,11 @@
 --   phonetic codes.
 module Text.SpellingSuggest.PCDB (
    DBConnection, defaultDB,
-   createDB, openDB, openDBFile, matchDB, closeDB
+   createDB, openDB, matchDB, closeDB
  ) where
 
 import qualified Control.Exception as C
+import Data.Maybe
 import Database.SQLite
 import Text.PhoneticCode.Soundex
 import Text.PhoneticCode.Phonix
@@ -30,8 +31,7 @@ createDB ws dbPath = do
   mapM_ (codeRow db) (ws `zip` (map (soundex True) ws `zip`
                                 map phonix ws))
   execStatement_ db "COMMIT;" >>= showError
-  hClose wf
-  return db
+  return $ DBConnection db
     where
       codeRow db (w, (sc, pc)) =
           insertRow db (tabName tab) [(colName cw, w),
@@ -66,7 +66,7 @@ openDB dbPath =
   where
     openDBFile dbp = do
       C.catch (do db <- openReadonlyConnection dbp
-               return (Just (DBConnection db)))
+                  return (Just (DBConnection db)))
         (const (return Nothing) :: C.IOException -> IO (Maybe DBConnection))
 
 -- | Return all the words in the given coding system matching the given code.

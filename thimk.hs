@@ -1,10 +1,14 @@
-import System.Console.ParseArgs hiding (args)
-import Text.Spell
-import Text.Spell.PCDB
-import System.IO
+-- Copyright © 2010 Greg Weber and Bart Massey
+-- [This program is licensed under the "3-clause ('new') BSD License"]
+-- Please see the file COPYING in this distribution for license information.
+
+import Text.SpellingSuggest
+
+import System.Console.ParseArgs
 
 data ArgIndex = ArgWord
-              | ArgCode
+              | ArgDB
+              | ArgCoder
               | ArgPrefilter
               | ArgNoPrefilter
               | ArgDict
@@ -13,49 +17,59 @@ data ArgIndex = ArgWord
 
 main :: IO ()
 main = do
-  args <- parseArgsIO ArgsComplete argd
-  let word = getRequiredArg args ArgWord 
-  let codename = getRequiredArg args ArgCode
-  let codef = pcode args codename
-  let choices = getRequiredArg args ArgChoices
-  mdb <- openDB
-  (havedb, wordlist) <- case mdb of
-    Nothing -> do
-      h <- argFileOpener (getRequiredArg args ArgDict) ReadMode
-      hSetEncoding h utf8
-      c <- hGetContents h
-      return (False, lines c)
-    Just db -> do
-      c <- matchDB db codename (codef word)
-      return (True, c)
-  let prefilter = prefilterable args havedb
-  putStr . unlines $ try_word prefilter codef choices word wordlist
+  -- Parse the arguments.
+  av <- parseArgsIO ArgsComplete argd
+  -- Go ahead and get the dictionary opened up.
+  let dictPath = getArg av ArgDict
+  let dbPath = getArg av ArgDB
+  dict <- openDictionary dictPath dbPath
+  -- Construct the search params.
+  let prefilter = prefilterate av $ dictionaryIsDB dict
+  let coder =  
+        case getArg av ArgCoder of
+          Just codername ->
+            case findPhoneticCoder codername of
+              Just c -> c
+              Nothing -> usageError av ("unknown phonetic coder " ++ codername)
+          Nothing -> defaultPhoneticCoder
+  let choices = getRequiredArg av ArgChoices
+  let parms = SearchParams {
+        searchParamsFilter = prefilter,
+        searchParamsCoder = coder,
+        searchParamsChoices = choices }
+  let word = getRequiredArg av ArgWord 
+  -- Do the search.
+  suggestions <- suggest parms dict word
+  putStr $ unlines suggestions
   where
-    prefilterable args havedb =
+    -- This logic for deciding when to prefilter is quite
+    -- complicated and probably unnecessary.
+    prefilterate av havedb =
         case npfarg && pfarg of
-          True -> usageError args "prefilter schizophrenia"
-          False -> not npfarg && not havedb || pfarg
+          True -> usageError av "prefilter schizophrenia"
+          False -> 
+            case not npfarg && not havedb || pfarg of
+              True -> defaultWordFilter
+              False -> anyWordFilter
         where
-          npfarg = gotArg args ArgNoPrefilter
-          pfarg = gotArg args ArgPrefilter
-    pcode args codename =
-        case codename of
-          "soundex" -> soundex True
-          "phonix" -> phonix
-          c -> usageError args ("unknown phonetic code " ++ c)
-
+          npfarg = gotArg av ArgNoPrefilter
+          pfarg = gotArg av ArgPrefilter
+    -- The command-line arguments.
     argd = [ Arg { argIndex = ArgDict,
                    argName = Just "dictionary",
                    argAbbr = Just 'd',
-                   argData = argDataDefaulted "path" ArgtypeString
-                               "/usr/share/dict/words",
+                   argData = argDataOptional "path" ArgtypeString,
                    argDesc = "Dictionary file to search" },
-             Arg { argIndex = ArgCode,
-                   argName = Just "code",
+             Arg { argIndex = ArgDB,
+                   argName = Just "pcdb",
+                   argAbbr = Just 'p',
+                   argData = argDataOptional "phonetic-code-db" ArgtypeString,
+                   argDesc = "Phonetic code database to search" },
+             Arg { argIndex = ArgCoder,
+                   argName = Just "coder",
                    argAbbr = Just 'c',
-                   argData = argDataDefaulted "phonetic-code" ArgtypeString
-                               "phonix",
-                   argDesc = "Phonetic code: one of soundex, phonix"},
+                   argData = argDataOptional "phonetic-coder" ArgtypeString,
+                   argDesc = "Phonetic coder: one of soundex, phonix"},
              Arg { argIndex = ArgChoices,
                    argName = Nothing,
                    argAbbr = Just 'n',

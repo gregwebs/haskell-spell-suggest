@@ -12,18 +12,22 @@ module Text.SpellingSuggest.PCDB (
 import qualified Control.Exception as C
 import Data.Maybe
 import Database.SQLite
+import System.Environment
 import Text.PhoneticCode.Soundex
 import Text.PhoneticCode.Phonix
 
 -- | File path for default cache database.
-defaultDB :: String
-defaultDB = "/var/lib/spell-suggest/pcdb.sq3"
+defaultDB :: IO String
+defaultDB = do
+  home <- getEnv "HOME"
+  return $ home ++ "/.thimk.sq3"
 
 -- | Create and populate the phonetic codes database, given
 -- a list of words and a database path.
 createDB :: [String] -> Maybe String -> IO DBConnection
 createDB ws dbPath = do
-  db <- openConnection $ fromMaybe defaultDB dbPath
+  defaultDBPath <- defaultDB
+  db <- openConnection $ fromMaybe defaultDBPath dbPath
   execStatement_ db ("DROP TABLE IF EXISTS " ++ tabName tab ++ ";")
                      >>= showError
   defineTableOpt db True tab >>= showError
@@ -61,8 +65,9 @@ newtype DBConnection = DBConnection SQLiteHandle
 
 -- | Open the phonetic codes database, given a database path.
 openDB :: Maybe String -> IO (Maybe DBConnection)
-openDB dbPath = 
-  openDBFile $ fromMaybe defaultDB dbPath
+openDB dbPath = do
+  defaultDBPath <- defaultDB
+  openDBFile $ fromMaybe defaultDBPath dbPath
   where
     openDBFile dbp = do
       C.catch (do db <- openReadonlyConnection dbp

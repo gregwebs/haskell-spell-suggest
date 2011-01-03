@@ -1,60 +1,37 @@
---- Spelling word suggestion tool
---- Copyright © 2008 Bart Massey
---- ALL RIGHTS RESERVED
+-- Copyright © 2010 Greg Weber and Bart Massey
+-- [This program is licensed under the "3-clause ('new') BSD License"]
+-- Please see the file COPYING in this distribution for license information.
 
---- This software is licensed under the "3-clause ('new')
---- BSD License".  Please see the file COPYING provided with
---- this distribution for license terms.
-
--- |Create and maintain a nonvolatile database of
---  phonetic codes for cheap lookup
-
-module Text.Spell.PCDB (
-   DBConnection, filePathOfDB, defaultDictionaryForDB,
+-- | Create and maintain a nonvolatile database of
+--   phonetic codes.
+module Text.SpellingSuggest.PCDB (
+   DBConnection, defaultDB,
    createDB, openDB, openDBFile, matchDB, closeDB
  ) where
 
 import qualified Control.Exception as C
 import Database.SQLite
-import System.IO
 import Text.PhoneticCode.Soundex
 import Text.PhoneticCode.Phonix
 
-{-
-{-# LANGUAGE CPP #-}
-#if DEBUG
-import Debug.Trace
-debug a = trace (show a) a
-#else
-debug = id
-#endif
-debug :: (Show a) => a -> a
--}
+-- | File path for default cache database.
+defaultDB :: String
+defaultDB = "/var/lib/spell-suggest/pcdb.sq3"
 
-filePathOfDB :: IO String
-filePathOfDB = return "pcdb.sq3"
-
-defaultDictionaryForDB :: String
-defaultDictionaryForDB = "/usr/share/dict/words"
-
--- |Create and populate the phonetic codes database.
-createDB :: String -> IO ()
-createDB wfn = do
-  dbfn <- filePathOfDB
-  db <- openConnection dbfn
+-- | Create and populate the phonetic codes database, given
+-- a list of words and a database path.
+createDB :: [String] -> Maybe String -> IO DBConnection
+createDB ws dbPath = do
+  db <- openConnection $ fromMaybe defaultDB dbPath
   execStatement_ db ("DROP TABLE IF EXISTS " ++ tabName tab ++ ";")
                      >>= showError
   defineTableOpt db True tab >>= showError
-  wf <- openFile wfn ReadMode
-  hSetEncoding wf utf8
-  wc <- hGetContents wf
-  let ws = lines wc
   execStatement_ db "BEGIN TRANSACTION;" >>= showError
   mapM_ (codeRow db) (ws `zip` (map (soundex True) ws `zip`
                                 map phonix ws))
   execStatement_ db "COMMIT;" >>= showError
   hClose wf
-  closeConnection db
+  return db
     where
       codeRow db (w, (sc, pc)) =
           insertRow db (tabName tab) [(colName cw, w),
@@ -82,20 +59,17 @@ createDB wfn = do
 -- | Database connection.
 newtype DBConnection = DBConnection SQLiteHandle
 
--- | Create a connection to the default database.
-openDB :: IO (Maybe DBConnection)
-openDB = do
-  dbfn <- filePathOfDB
-  openDBFile dbfn
+-- | Open the phonetic codes database, given a database path.
+openDB :: Maybe String -> IO (Maybe DBConnection)
+openDB dbPath = 
+  openDBFile $ fromMaybe defaultDB dbPath
+  where
+    openDBFile dbp = do
+      C.catch (do db <- openReadonlyConnection dbp
+               return (Just (DBConnection db)))
+        (const (return Nothing) :: C.IOException -> IO (Maybe DBConnection))
 
--- | Create a connection to the given database.
-openDBFile :: String -> IO (Maybe DBConnection)
-openDBFile dbfn = do
-  C.catch (do db <- openReadonlyConnection dbfn
-              return (Just (DBConnection db)))
-          (const (return Nothing) :: C.IOException -> IO (Maybe DBConnection))
-
--- |Return all the words in the given coding system matching the given code.
+-- | Return all the words in the given coding system matching the given code.
 matchDB :: DBConnection -> String -> String -> IO [String]
 matchDB (DBConnection db) coding code = do
     result <- execParamStatement db

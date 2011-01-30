@@ -1,4 +1,4 @@
-name: spell-suggest
+name: spelling-suggest
 version: 0.5.0
 cabal-version: >= 1.2
 build-type: Simple
@@ -7,11 +7,10 @@ license-file: COPYING
 copyright: Copyright © 2010 Greg Weber and Bart Massey
 author: Greg Weber and Bart Massey
 maintainer: bart@cs.pdx.edu, greg@gregweber.info
-stability: alpha
 homepage: http://wiki.cs.pdx.edu/bartforge/thimk
 category: Console, Text
 data-files: README, README.pcdb
-synopsis: spelling suggestion tool. Library and command-line interfaces.
+synopsis: Spelling suggestion tool with library and command-line interfaces.
 description: 
 
     "thimk" (an old joke) is a command-line spelling word
@@ -19,7 +18,8 @@ description:
     and it spits out one or more properly-spelled words in order
     of likelihood of similarity.
     .
-    This package is also exported as a library: Text.Spell (suggest)
+    This functionality is also exported as a library via
+    Text.SpellingSuggest (suggest)
     .
     There is an optional precompiled SQlite database of phonetic
     codes for the entire dictionary, created with
@@ -30,23 +30,29 @@ flag debug
 
 library
   build-depends: base >= 4.2 && < 5,
-                 edit-distance >= 0.1, phonetic-code >= 0.1,
-                 sqlite >= 0.5.1
+                 edit-distance >= 0.1 && < 0.2,
+                 phonetic-code >= 0.1 && < 0.2,
+                 sqlite >= 0.5.1 && < 0.6
   exposed-modules: Text.SpellingSuggest, Text.SpellingSuggest.PCDB,
                    Text.SpellingSuggest.LowLevel,
                    Text.SpellingSuggest.Dictionary
-  ghc-options:     -Wall
+  ghc-options: -Wall
 
 Executable thimk
   main-is: thimk.hs
-  build-depends: base >= 4.2 && < 5, parseargs >= 0.1.1,
-                 edit-distance >= 0.1, phonetic-code >= 0.1,
-                 sqlite >= 0.5.1
-  ghc-options:     -Wall
+  build-depends: base >= 4.2 && < 5,
+                 parseargs >= 0.1.1 && < 0.2,
+                 edit-distance >= 0.1 && < 0.2,
+                 phonetic-code >= 0.1 && < 0.2,
+                 sqlite >= 0.5.1 && < 0.6
+  ghc-options: -Wall
 
 Executable thimk-makedb
   main-is: thimk-makedb.hs
-  build-depends: parseargs >= 0.1.1, sqlite >= 0.4.1, phonetic-code >= 0.1
-  ghc-options:     -Wall
+  build-depends: base >= 4.2 && < 5,
+                 parseargs >= 0.1.1 && < 0.2,
+                 phonetic-code >= 0.1 && < 0.2,
+                 sqlite >= 0.5.1 && < 0.6
+  ghc-options: -Wall
   if flag(debug)
     cpp-options: -DDEBUG

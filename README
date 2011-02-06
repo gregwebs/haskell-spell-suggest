@@ -1,10 +1,12 @@
 Spelling word suggestion tool
-Copyright © 2008 Bart Massey
+Copyright © 2010 Bart Massey and Greg Weber
 ALL RIGHTS RESERVED
 
 This software is licensed under the "3-clause ('new')
 BSD License".  Please see the file COPYING provided with
 this distribution for license terms.
+
+This package is a newer version of the original package called "thimk".
 
 "thimk" (an old joke) is a command-line spelling word
 suggestion tool.  You give it a possibly-misspelled word,

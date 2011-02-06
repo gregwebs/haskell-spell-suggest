@@ -4,8 +4,8 @@ cabal-version: >= 1.2
 build-type: Simple
 license: BSD3
 license-file: COPYING
-copyright: Copyright © 2010 Greg Weber and Bart Massey
-author: Greg Weber and Bart Massey
+copyright: Copyright © 2010 Bart Massey and Greg Weber
+author: Bart Massey and Greg Weber
 maintainer: bart@cs.pdx.edu, greg@gregweber.info
 homepage: http://wiki.cs.pdx.edu/bartforge/thimk
 category: Console, Text
@@ -13,18 +13,20 @@ data-files: README, README.pcdb
 synopsis: Spelling suggestion tool with library and command-line interfaces.
 description: 
 
-    "thimk" (an old joke) is a command-line spelling word
-    suggestion tool. You give it a possibly-misspelled word,
-    and it spits out one or more properly-spelled words in order
+    Given a possibly-misspelled word,
+    this tool spits out one or more properly-spelled words in order
     of likelihood of similarity.
     .
-    This functionality is also exported as a library via
-    Text.SpellingSuggest (suggest)
+    This functionality is exported as a library via
+    Text.SpellingSuggest (suggest) and as
+    a command-line program "thimk" (an old joke)
     .
-    There is an optional precompiled SQlite database of phonetic
-    codes for the entire dictionary, created with
-    "thimk-makedb".  This greatly speeds lookup, permitting
-    reasonable performance on enormous dictionaries.
+    Running the program "thimk-makedb" is an optional (but highly recommended)
+    step to speed up lookups,
+    permitting reasonable performance on enormous dictionaries
+    by creating a
+    precompiled SQlite database of phonetic
+    codes for a dictionary.
 
 flag debug
 

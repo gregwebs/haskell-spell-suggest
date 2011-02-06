@@ -22,7 +22,7 @@ main = do
   -- Go ahead and get the dictionary opened up.
   let dictPath = getArg av ArgDict
   let dbPath = getArg av ArgDB
-  dict <- openDictionary dictPath dbPath
+  dict <- openDictionary dbPath dictPath 
   -- Construct the search params.
   let prefilter = prefilterate av $ dictionaryIsDB dict
   let coder =  

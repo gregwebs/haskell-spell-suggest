@@ -15,11 +15,11 @@ import Database.SQLite
 import Text.PhoneticCode.Soundex
 import Text.PhoneticCode.Phonix
 
-import Paths_spelling_suggest;
+-- import Paths_spelling_suggest;
 
 -- | File path for default cache database.
 defaultDB :: IO String
-defaultDB = getDataFileName "spelling-suggest.sq3"
+defaultDB = return "spelling-suggest.sq3"
 
 -- | Create and populate the phonetic codes database, given
 -- a list of words and a database path.

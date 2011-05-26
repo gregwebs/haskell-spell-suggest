@@ -1,5 +1,5 @@
 name: spelling-suggest
-version: 0.5.0.1
+version: 0.5.1.0
 cabal-version: >= 1.2
 build-type: Simple
 license: BSD3
@@ -32,7 +32,7 @@ flag debug
 
 library
   build-depends: base >= 4.2 && < 5,
-                 edit-distance >= 0.1 && < 0.2,
+                 edit-distance >= 0.1 && < 0.3,
                  phonetic-code >= 0.1 && < 0.2,
                  sqlite >= 0.5.1 && < 0.6
   exposed-modules: Text.SpellingSuggest, Text.SpellingSuggest.PCDB,
@@ -44,7 +44,7 @@ Executable thimk
   main-is: thimk.hs
   build-depends: base >= 4.2 && < 5,
                  parseargs >= 0.1.1 && < 0.2,
-                 edit-distance >= 0.1 && < 0.2,
+                 edit-distance >= 0.1 && < 0.3,
                  phonetic-code >= 0.1 && < 0.2,
                  sqlite >= 0.5.1 && < 0.6
   ghc-options: -Wall

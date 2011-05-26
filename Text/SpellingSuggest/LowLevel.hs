@@ -32,10 +32,10 @@ editDistance :: String -> String -> Int
 editDistance s t =
   restrictedDamerauLevenshteinDistance ec s t where
     ec = EditCosts {
-      insertionCost = 2,
-      deletionCost = 2,
-      transpositionCost = 1,
-      substitutionCost = 3 }
+      insertionCosts = ConstantCost 2,
+      deletionCosts = ConstantCost 2,
+      transpositionCosts = ConstantCost 1,
+      substitutionCosts = ConstantCost 3 }
 
 -- | Map any given word to a constant "phonetic code".
 --   In other words, suppress phonetic coding.

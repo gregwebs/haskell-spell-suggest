@@ -1,13 +1,13 @@
 name: spelling-suggest
 version: 0.5.1
-cabal-version: >= 1.2
+cabal-version: >= 1.6
 build-type: Simple
 license: BSD3
 license-file: COPYING
 copyright: Copyright © 2010 Greg Weber and Bart Massey
 author: Greg Weber and Bart Massey
 maintainer: bart@cs.pdx.edu, greg@gregweber.info
-homepage: http://wiki.cs.pdx.edu/bartforge/thimk
+homepage: https://github.com/BartMassey/haskell-spell-suggest
 category: Console, Text
 data-files: README, README.pcdb
 synopsis: Spelling suggestion tool with library and command-line interfaces.
@@ -56,3 +56,12 @@ Executable thimk-makedb
   ghc-options: -Wall
   if flag(debug)
     cpp-options: -DDEBUG
+
+Source-repository head
+  type: git
+  location: git://github.com/BartMassey/haskell-spell-suggest.git
+
+Source-repository this
+  type: git
+  location: git://github.com/BartMassey/haskell-spell-suggest.git
+  tag: v0.5.1

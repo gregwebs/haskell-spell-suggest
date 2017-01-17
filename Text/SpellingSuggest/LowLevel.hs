@@ -42,8 +42,13 @@ editDistance s t =
 trivialPhoneticCode :: String -> String
 trivialPhoneticCode = const ""
 
+-- | Filter function takes a word to filter for, a word
+-- to compare with, and returns `True` or `False` as the
+-- words are close enough to keep.
 type SpellingWordFilter = String -> String -> Bool
 
+-- | Coding function takes a word and returns its
+-- phonetic code.
 type SpellingWordCoder = String -> String
 
 -- | Core algorithm for spelling suggestion. Takes a

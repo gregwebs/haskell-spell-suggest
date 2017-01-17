@@ -91,6 +91,7 @@ openDictionary dbPath dictPath = do
       dict <- readDictionary dictPath
       return $ WordList dict
 
+-- | Close the connection to the given or default database.
 closeDictionary :: SpellingDictionary -> IO ()
 closeDictionary (SpellingDatabase db) = closeDB db
 closeDictionary _ = return ()

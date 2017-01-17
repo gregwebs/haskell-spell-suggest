@@ -83,5 +83,6 @@ matchDB (DBConnection db) coding code = do
       Left msg -> error msg
       Right rows -> return (map (snd . head) . head $ rows)
 
+-- | Close the database connection.
 closeDB :: DBConnection -> IO ()
 closeDB (DBConnection db) = closeConnection db

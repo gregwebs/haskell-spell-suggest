@@ -1,0 +1,7 @@
+packages: .
+
+-- https://github.com/GaloisInc/sqlite/pull/14
+source-repository-package
+    type: git
+    location: https://github.com/GaloisInc/sqlite
+    tag: e93ee84000c1d1eedbc23036c4a20ffd07e3145f
